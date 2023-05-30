@@ -1,13 +1,16 @@
 #include "common.hpp"
 #include "server.hpp"
 
+#include "trace/Trace.hpp"
+#define CLASS_ABBR "SERVER"
+
 
 
 namespace server {
 
    void thread_loop( int client_socket )
    {
-      printf( "client thread enter: %d\n", client_socket );
+      MSG_INF( "client thread enter: %d", client_socket );
 
       const size_t buffer_size = common::default_values::message_max_size;
       char buffer[ buffer_size ];
@@ -20,32 +23,32 @@ namespace server {
             int error = errno;
             if( EAGAIN == error )
             {
-               printf( "'recv' error: %d\n", error );
+               MSG_ERR( "recv(%d) error: %d", client_socket, error );
                continue;
             }
             else
             {
-               printf( "client disconnected: %d\n", client_socket );
+               MSG_INF( "client disconnected: %d", client_socket );
                break;
             }
          }
          buffer[ recv_size ] = 0;
-         printf( "'recv' success: %ld bytes / '%s'\n", recv_size, buffer );
+         MSG_DBG( "recv(%d) success: %ld bytes / '%s'", client_socket, recv_size, buffer );
 
          // Send message to client
          ssize_t send_size = send( client_socket, buffer, recv_size, 0 );
          if( -1 == send_size )
          {
             int error = errno;
-            printf( "'send' error: %d\n", error );
+            MSG_ERR( "send(%d) error: %d", client_socket, error );
             break;
          }
-         printf( "'send' success: %ld bytes / '%s'\n", send_size, buffer );
+         MSG_DBG( "send(%d) success: %ld bytes / '%s'", client_socket, send_size, buffer );
       }
 
       close( client_socket );
 
-      printf( "client thread exit: %d\n", client_socket );
+      MSG_INF( "client thread exit: %d", client_socket );
    }
 
    int run( const base::Parameters::tSptr parameters )
@@ -64,10 +67,10 @@ namespace server {
       if( -1 == master_socket )
       {
          int error = errno;
-         printf( "'socket' error: %d\n", error );
+         MSG_ERR( "socket(%d, %d, %d) error: %d", socket_family, socket_type, socket_protocole, error );
          return error;
       }
-      printf( "'socket' success: %d\n", master_socket );
+      MSG_DBG( "socket(%d) success: %d", master_socket );
 
       int result_bind = -1;
       if( AF_UNIX == socket_family )
@@ -124,18 +127,18 @@ namespace server {
       if( -1 == result_bind )
       {
          int error = errno;
-         printf( "'bind' error: %d\n", error );
+         MSG_ERR( "bind(%d) error: %d", master_socket, error );
          return error;
       }
-      printf( "'bind' success\n" );
+      MSG_DBG( "bind(%d) success", master_socket );
 
       if( -1 == listen( master_socket, 0 ) )
       {
          int error = errno;
-         printf( "'listen' error: %d\n", error );
+         MSG_ERR( "listen(%d) error: %d", master_socket, error );
          return error;
       }
-      printf( "'listen' success\n" );
+      MSG_DBG( "listen(%d) success", master_socket );
 
       struct sockaddr_vm client_addr;
       socklen_t client_addr_size = sizeof( struct sockaddr_vm );
@@ -149,10 +152,10 @@ namespace server {
          if( -1 == client_socket )
          {
             int error = errno;
-            printf( "'accept' error: %d\n", error );
+            MSG_ERR( "accept(%d) error: %d", master_socket, error );
             continue;
          }
-         printf( "'accept' success: %d\n", client_socket );
+         MSG_DBG( "accept(%d) success: %d", master_socket, client_socket );
 
          client_threads.push_back( std::thread{ thread_loop, client_socket } );
       }

@@ -17,7 +17,8 @@ OBJEXT      := o
 # Flags, Libraries and Includes
 #CFLAGS      := -fopenmp -Wall -O3 -g
 #LIB         := -fopenmp -lm -larmadillo
-CFLAGS      := -g -std=c++17
+CCONST		:= -DOS_LINUX=0 -DOS_ANDROID=1 -DOS_TARGET=OS_LINUX -DMSG_TRACE -DCOLORED_TRACE
+CFLAGS      := -g -std=c++17 $(CCONST)
 LIB         := -lrt
 INC         := -I./$(SRCDIR) -I./$(SRCDIR)/include -I/usr/local/include
 INCDEP      := -I./$(SRCDIR) -I./$(SRCDIR)/include
@@ -60,12 +61,16 @@ directories:
 # Execute
 server:
 	reset
-	$(TARGETDIR)/$(TARGET) --server --family=AF_VSOCK --address=1 --port=5400
+	$(TARGETDIR)/$(TARGET) --server \
+		--family=AF_VSOCK --address=1 --port=5400 \
+		--trace_log=console --trace_buffer=4096 --trace_app_name=lstszrv --trace_level=4
 
 client:
 	reset
-	$(TARGETDIR)/$(TARGET) --client --family=AF_VSOCK --address=1 --port=5400 --mode=random --timeout=500 --length=0
-# 	$(TARGETDIR)/$(TARGET) --client --family=AF_VSOCK --address=1 --port=5400 --mode=count --timeout=500
+	$(TARGETDIR)/$(TARGET) --client \
+		--family=AF_VSOCK --address=1 --port=5400 \
+		--mode=random --timeout=500 --length=0 \
+		--trace_log=console --trace_buffer=4096 --trace_app_name=lstcl --trace_level=4
 
 usage:
 	reset

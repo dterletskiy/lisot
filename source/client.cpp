@@ -2,6 +2,9 @@
 #include "common.hpp"
 #include "client.hpp"
 
+#include "trace/Trace.hpp"
+#define CLASS_ABBR "CLIENT"
+
 
 
 namespace client {
@@ -22,10 +25,10 @@ namespace client {
       if( -1 == master_socket )
       {
          int error = errno;
-         printf( "'socket' error: %d\n", error );
+         MSG_ERR( "socket(%d, %d, %d) error: %d", socket_family, socket_type, socket_protocole, error );
          return error;
       }
-      printf( "'socket' success: %d\n", master_socket );
+      MSG_DBG( "socket(%d) success: %d", master_socket );
 
       int result_connect = -1;
       if( AF_UNIX == socket_family )
@@ -52,14 +55,14 @@ namespace client {
          if( 0 == result )
          {
             int error = errno;
-            printf( "'inet_pton' error: %d\n", error );
-            printf( "'address' is not in presentation format\n" );
+            MSG_ERR( "'inet_pton' error: %d", error );
+            MSG_ERR( "'address' is not in presentation format" );
             return error;
          }
          else if( 0 > result )
          {
             int error = errno;
-            printf( "'inet_pton' error: %d\n", error );
+            MSG_ERR( "'inet_pton' error: %d", error );
             return error;
          }
          uint32_t address = address_buf.s_addr;
@@ -94,10 +97,10 @@ namespace client {
       if( -1 == result_connect )
       {
          int error = errno;
-         printf( "'connect' error: %d\n", error );
+         MSG_ERR( "connect(%d) error: %d", master_socket, error );
          return error;
       }
-      printf( "'connect' success\n" );
+      MSG_DBG( "connect(%d) success", master_socket );
 
       std::string send_message;
       std::string recv_message;
@@ -121,7 +124,7 @@ namespace client {
          }
          else if( "message" == mode )
          {
-            printf( "Enter a message:\n" );
+            MSG_WRN( "Enter a message:" );
             send_message.clear( );
             std::getline( std::cin, send_message );
             if( "exit" == send_message )
@@ -142,10 +145,10 @@ namespace client {
          if( -1 == send_size )
          {
             int error = errno;
-            printf( "'send' error: %d\n", error );
+            MSG_ERR( "send(%d) error: %d", master_socket, error );
             return error;
          }
-         printf( "'send' success: %ld bytes / '%s'\n", send_size, send_message.c_str( ) );
+         MSG_DBG( "send(%d) success: %ld bytes / '%s'", master_socket, send_size, send_message.c_str( ) );
 
          // Receive message from server
          ssize_t recv_size = recv( master_socket, &buffer, buffer_size - 1, 0 );
@@ -154,26 +157,26 @@ namespace client {
             int error = errno;
             if( EAGAIN == error )
             {
-               printf( "'recv' error: %d\n", error );
+               MSG_ERR( "recv(%d) error: %d", master_socket, error );
                continue;
             }
             else
             {
-               printf( "server disconnected\n" );
+               MSG_INF( "server disconnected" );
                break;
             }
          }
          buffer[ recv_size ] = 0;
-         printf( "'recv' success: %ld bytes / '%s'\n", recv_size, buffer );
+         MSG_DBG( "recv(%d) success: %ld bytes / '%s'", master_socket, recv_size, buffer );
 
          // Compare messages
          if( send_message == buffer )
          {
-            printf( "callback ok\n" );
+            MSG_INF( "callback ok" );
          }
          else
          {
-            printf( "callback nok\n" );
+            MSG_ERR( "callback nok" );
          }
       }
 
