@@ -33,7 +33,8 @@ namespace server {
             }
          }
          buffer[ recv_size ] = 0;
-         MSG_DBG( "recv(%d) success: %ld bytes / '%s'", client_socket, recv_size, buffer );
+         MSG_DBG( "recv(%d): %zd bytes", client_socket, recv_size );
+         MSG_VRB( "received message: '%s'", buffer );
 
          // Send message to client
          ssize_t send_size = send( client_socket, buffer, recv_size, 0 );
@@ -43,7 +44,8 @@ namespace server {
             MSG_ERR( "send(%d) error: %d", client_socket, error );
             break;
          }
-         MSG_DBG( "send(%d) success: %ld bytes / '%s'", client_socket, send_size, buffer );
+         MSG_DBG( "send(%d) success: %zd bytes", client_socket, send_size, buffer );
+         MSG_VRB( "sent message: '%s'", buffer );
       }
 
       close( client_socket );

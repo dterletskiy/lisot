@@ -148,7 +148,8 @@ namespace client {
             MSG_ERR( "send(%d) error: %d", master_socket, error );
             return error;
          }
-         MSG_DBG( "send(%d) success: %ld bytes / '%s'", master_socket, send_size, send_message.c_str( ) );
+         MSG_DBG( "send(%d) success: %zd bytes", master_socket, send_size );
+         MSG_VRB( "sent message: '%s'", send_message.c_str( ) );
 
          // Receive message from server
          ssize_t recv_size = recv( master_socket, &buffer, buffer_size - 1, 0 );
@@ -167,7 +168,8 @@ namespace client {
             }
          }
          buffer[ recv_size ] = 0;
-         MSG_DBG( "recv(%d) success: %ld bytes / '%s'", master_socket, recv_size, buffer );
+         MSG_DBG( "recv(%d): %zd bytes", master_socket, recv_size );
+         MSG_VRB( "received message: '%s'", buffer );
 
          // Compare messages
          if( send_message == buffer )

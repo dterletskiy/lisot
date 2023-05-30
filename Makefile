@@ -63,14 +63,14 @@ server:
 	reset
 	$(TARGETDIR)/$(TARGET) --server \
 		--family=AF_VSOCK --address=1 --port=5400 \
-		--trace_log=console --trace_buffer=4096 --trace_app_name=lstszrv --trace_level=4
+		--trace_log=console --trace_buffer=4096 --trace_app_name=lstszrv --trace_level=6
 
 client:
 	reset
 	$(TARGETDIR)/$(TARGET) --client \
 		--family=AF_VSOCK --address=1 --port=5400 \
 		--mode=random --timeout=500 --length=0 \
-		--trace_log=console --trace_buffer=4096 --trace_app_name=lstcl --trace_level=4
+		--trace_log=console --trace_buffer=4096 --trace_app_name=lstcl --trace_level=6
 
 usage:
 	reset
