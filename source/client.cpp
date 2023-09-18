@@ -137,6 +137,8 @@ namespace client {
                message_size = sot::random::number( 1, common::default_values::message_max_size - 1 );
             else if( common::default_values::message_max_size < message_length )
                message_size = common::default_values::message_max_size;
+            else
+               message_size = message_length;
             send_message = sot::random::text( message_size );
          }
 
