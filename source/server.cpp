@@ -77,15 +77,16 @@ namespace server {
       int result_bind = -1;
       if( AF_UNIX == socket_family )
       {
-         const char* address = parameters->value_or< std::string >(
+         // Here "address" must be a string not "char*" to avoid pointer to destroyed temporary object
+         std::string address = parameters->value_or< std::string >(
                "address", common::default_values::address_unix
-            ).first.c_str( );
+            ).first;
 
          struct sockaddr_un addr_un;
          memset( &addr_un, 0, sizeof( sockaddr_un ) );
          addr_un.sun_family = socket_family;
-         strncpy( addr_un.sun_path, address, sizeof(addr_un.sun_path) - 1 );
-         unlink( address );
+         strncpy( addr_un.sun_path, address.c_str( ), sizeof(addr_un.sun_path) - 1 );
+         unlink( address.c_str( ) );
          int addr_un_size = sizeof( addr_un.sun_family ) + strlen( addr_un.sun_path );
 
          result_bind = bind( master_socket, (sockaddr*)(&addr_un), addr_un_size );
