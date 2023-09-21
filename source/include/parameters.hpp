@@ -64,7 +64,7 @@ namespace base {
       if( invalid_value == iterator->second )
          return std::make_pair( invalid_value, true );
 
-      std::stringstream ss( iterator->second );
+      std::stringstream ss( iterator->second.value( ) );
       T value;
       ss >> value;
 
