@@ -24,6 +24,7 @@ namespace trace {
          case eLogLevel::WARNING:   return FG_LIGHT_BLUE;
          case eLogLevel::ERROR:     return FG_LIGHT_RED;
          case eLogLevel::FATAL:     return FG_RED;
+         default:                   break;
       }
       return FG_WHITE;
    }
@@ -39,6 +40,7 @@ namespace trace {
          case eLogLevel::WARNING:   return ANDROID_LOG_WARN;
          case eLogLevel::ERROR:     return ANDROID_LOG_ERROR;
          case eLogLevel::FATAL:     return ANDROID_LOG_FATAL;
+         default:                   break;
       }
       return ANDROID_LOG_VERBOSE;
    }

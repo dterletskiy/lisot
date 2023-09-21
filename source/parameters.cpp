@@ -35,7 +35,7 @@ struct InvalidArgument : public std::exception
 
 Parameters::Parameters( int argc, char* argv[ ], const tMap& default_parameters )
 {
-   for( size_t count = 1; count < argc; ++count )
+   for( int count = 1; count < argc; ++count )
    {
       std::string argument( argv[ count ] );
       argument.erase( 0, default_prefix.length( ) );
@@ -59,7 +59,7 @@ Parameters::tSptr Parameters::create( int argc, char* argv[ ], const tMap& defau
       return nullptr;
 
    bool result = true;
-   for( size_t count = 1; count < argc; ++count )
+   for( int count = 1; count < argc; ++count )
    {
       std::string argument( argv[ count ] );
 
