@@ -1,5 +1,10 @@
+$(info SYSROOT - ${SYSROOT})
+$(info CC - ${CC})
+$(info CPPFLAGS - ${CPPFLAGS})
+$(info CXXFLAGS - ${CXXFLAGS})
+
 # Compiler and Linker
-CC          := g++
+# CC          := g++
 
 # The Target Binary Program
 TARGET      := lisot
@@ -15,13 +20,13 @@ DEPEXT      := d
 OBJEXT      := o
 
 # Flags, Libraries and Includes
-#CFLAGS      := -fopenmp -Wall -O3 -g
+#CFLAGS      := -fopenmp -Wall -Wextra -Wpedantic -O3 -g
 #LIB         := -fopenmp -lm -larmadillo
 CCONST		:= -DOS_LINUX=0 -DOS_ANDROID=1 -DOS_TARGET=OS_LINUX -DMSG_TRACE -DCOLORED_TRACE
-CFLAGS      := -g -std=c++17 $(CCONST)
-LIB         := -lrt
-INC         := -I./$(SRCDIR) -I./$(SRCDIR)/include -I/usr/local/include
-INCDEP      := -I./$(SRCDIR) -I./$(SRCDIR)/include
+CFLAGS      := -g -std=c++17 $(CCONST) $(CFLAGS)
+LIB         := -lrt -lstdc++ -L$(SYSROOT)/lib
+INC         := -I./$(SRCDIR) -I./$(SRCDIR)/include -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/local/include
+INCDEP      := -I./$(SRCDIR) -I./$(SRCDIR)/include -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/local/include
 
 #---------------------------------------------------------------------------------
 #DO NOT EDIT BELOW THIS LINE
@@ -47,7 +52,7 @@ clean:
 
 # Set configuration
 config: directories
-	reset
+# 	reset
 
 # Copy Resources from Resources Directory to Target Directory
 resources: directories
@@ -60,28 +65,29 @@ directories:
 
 # Execute
 server:
-	reset
 	$(TARGETDIR)/$(TARGET) --server \
 		--family=AF_VSOCK --address=1 --port=5400 \
 		--trace_log=console --trace_buffer=4096 --trace_app_name=lstszrv --trace_level=6
 
 client:
-	reset
 	$(TARGETDIR)/$(TARGET) --client \
 		--family=AF_VSOCK --address=1 --port=5400 \
 		--mode=random --timeout=500 --length=0 \
 		--trace_log=console --trace_buffer=4096 --trace_app_name=lstcl --trace_level=6
 
 usage:
-	reset
 	$(TARGETDIR)/$(TARGET)
+
+install:
+	install -d $(DESTDIR)/usr/bin
+	install -m 0755 $(TARGET) $(DESTDIR)/usr/bin
 
 # Pull in dependency info for *existing* .o files
 -include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))
 
 # Link
 $(TARGET): $(OBJECTS)
-	$(CC) -o $(TARGETDIR)/$(TARGET) $^ $(LIB)
+	$(CC) -o $(TARGETDIR)/$(TARGET) $^ $(LIB) $(LDFLAGS)
 
 # Compile
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
