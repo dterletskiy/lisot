@@ -1,0 +1,23 @@
+cc_binary {
+    name: "lisot",
+    defaults: ["vhal_v2_0_target_defaults"],
+    vendor: true,
+    relative_install_path: "hw",
+    srcs: [
+        "source/client.cpp",
+        "source/common.cpp",
+        "source/main.cpp",
+        "source/parameters.cpp",
+        "source/random.cpp",
+        "source/server.cpp",
+        "source/trace/Logger.cpp",
+        "source/trace/Types.cpp",
+    ],
+    cflags: [
+        "-Wno-unused-parameter",
+        "-Wno-ignored-qualifiers",
+        "-Wno-unused-private-field",
+        "-Wno-unused-variable",
+    ],
+    local_include_dirs: ["source/include"],
+}
