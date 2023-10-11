@@ -80,7 +80,7 @@ usage:
 
 install:
 	install -d $(DESTDIR)/usr/bin
-	install -m 0755 $(TARGET) $(DESTDIR)/usr/bin
+	install -m 0755 $(TARGETDIR)/$(TARGET) $(DESTDIR)/usr/bin
 
 # Pull in dependency info for *existing* .o files
 -include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))
