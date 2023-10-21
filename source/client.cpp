@@ -28,7 +28,7 @@ namespace client {
          MSG_ERR( "socket(%d, %d, %d) error: %d", socket_family, socket_type, socket_protocole, error );
          return error;
       }
-      MSG_DBG( "socket(%d) success: %d", master_socket );
+      MSG_DBG( "socket(%d) success", master_socket );
 
       int result_connect = -1;
       if( AF_UNIX == socket_family )
@@ -77,6 +77,24 @@ namespace client {
          addr_in.sin_addr.s_addr = address;
          addr_in.sin_port = htons( port );
          int addr_in_size = sizeof( addr_in );
+
+         const auto interface = parameters->value( "interface" );
+         if( true == interface.second && base::Parameters::invalid_value != interface.first )
+         {
+            const std::string interface_name = interface.first.value( );
+
+            struct ifreq ifr;
+            memset( &ifr, 0, sizeof( ifr ) );
+            strncpy( ifr.ifr_name, interface_name.c_str( ), IFNAMSIZ );
+            if( 0 != setsockopt( master_socket, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof( ifr ) ) )
+            {
+               int error = errno;
+               MSG_ERR( "setsockopt(%d) error: %d", master_socket, error );
+               return error;
+            }
+            MSG_DBG( "setsockopt(%d) success", master_socket );
+
+         }
 
          result_connect = connect( master_socket, (struct sockaddr*) &addr_in, addr_in_size );
       }

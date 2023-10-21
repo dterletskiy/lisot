@@ -39,6 +39,32 @@ int main( int argc, char* argv[ ] )
 
 
 
+   if( parameters->is_exist( "info" ) )
+   {
+      // http://web.archive.org/web/20090812134009/http://tuxology.net/tag/interface
+
+      struct ifaddrs *addrs;
+      getifaddrs( &addrs );
+
+      for( struct ifaddrs *addr = addrs; nullptr != addr; addr = addr->ifa_next )
+      {
+         if( addr->ifa_addr && AF_PACKET == addr->ifa_addr->sa_family )
+         {
+            MSG_DBG( "addr->ifa_name: %s", addr->ifa_name );
+            if( addr->ifa_addr )
+            {
+               MSG_VRB( "addr->ifa_addr->sa_family: %u", addr->ifa_addr->sa_family );
+               MSG_VRB( "addr->ifa_addr->sa_data: %s", addr->ifa_addr->sa_data );
+            }
+            MSG_VRB( );
+         }
+      }
+
+      freeifaddrs( addrs );
+
+      return 0;
+   }
+
    const bool is_server = parameters->is_exist( "server" );
    const bool is_client = parameters->is_exist( "client" );
 

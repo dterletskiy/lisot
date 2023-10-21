@@ -72,7 +72,7 @@ namespace server {
          MSG_ERR( "socket(%d, %d, %d) error: %d", socket_family, socket_type, socket_protocole, error );
          return error;
       }
-      MSG_DBG( "socket(%d) success: %d", master_socket );
+      MSG_DBG( "socket(%d) success", master_socket );
 
       int result_bind = -1;
       if( AF_UNIX == socket_family )

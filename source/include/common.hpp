@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <net/if.h>
+#include <ifaddrs.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
