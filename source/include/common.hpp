@@ -25,23 +25,24 @@ namespace common {
 
    namespace default_values {
 
-      const std::string socket_family = "AF_VSOCK";
-      const std::string socket_type = "SOCK_STREAM";
-      const int socket_protocole = 0;
+      const std::string socket_family   = "AF_VSOCK";
+      const std::string socket_type     = "SOCK_STREAM";
+      const int socket_protocole        = 0;
 
-      // const int address_vsock          = VMADDR_CID_HYPERVISOR;
-      const int address_vsock          = VMADDR_CID_LOCAL;
-      // const int address_vsock          = VMADDR_CID_HOST;
-      const char* const address_inet   = "127.0.0.1";
-      const char* const address_unix   = "/tmp/unix.socket";
+      // const int address_vsock           = VMADDR_CID_HYPERVISOR;
+      const int address_vsock           = VMADDR_CID_LOCAL;
+      // const int address_vsock           = VMADDR_CID_HOST;
+      const char* const address_inet    = "127.0.0.1";
+      const char* const address_unix    = "/tmp/unix.socket";
 
-      const int port                   = 5000;
+      const int port                    = 5000;
 
-      const int timeout                = 1000;
-      const std::string mode           = "count";
-      const size_t message_length      = 0;
+      const int timeout                 = 1000;
+      const std::string mode            = "count";
+      const size_t message_length       = 0;
+      const size_t count                = std::numeric_limits< size_t >::max( );
 
-      const size_t message_max_size    = 4096;
+      const size_t message_max_size     = 4096;
 
    }
 

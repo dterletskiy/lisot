@@ -5,7 +5,7 @@ Client-server applications for testing Linux socket communication.
 Server is the echo-server.
 
 USAGE:
-   lisot --server|--client [PARAMETER...]
+   lisot --server|--client|--info [PARAMETER...]
 
 PARAMETER:
 

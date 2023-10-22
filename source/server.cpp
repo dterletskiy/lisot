@@ -75,57 +75,68 @@ namespace server {
       MSG_DBG( "socket(%d) success", master_socket );
 
       int result_bind = -1;
-      if( AF_UNIX == socket_family )
+      switch( socket_family )
       {
-         // Here "address" must be a string not "char*" to avoid pointer to destroyed temporary object
-         std::string address = parameters->value_or< std::string >(
-               "address", common::default_values::address_unix
-            ).first;
-
-         struct sockaddr_un addr_un;
-         memset( &addr_un, 0, sizeof( sockaddr_un ) );
-         addr_un.sun_family = socket_family;
-         strncpy( addr_un.sun_path, address.c_str( ), sizeof(addr_un.sun_path) - 1 );
-         unlink( address.c_str( ) );
-         int addr_un_size = sizeof( addr_un.sun_family ) + strlen( addr_un.sun_path );
-
-         result_bind = bind( master_socket, (sockaddr*)(&addr_un), addr_un_size );
-      }
-      else if( AF_INET == socket_family )
-      {
-         uint32_t address = htonl( INADDR_ANY );
-         const std::string address_string = parameters->value_or< std::string >( "address", "" ).first;
-         if( !address_string.empty( ) )
+         case AF_UNIX:
          {
-            address = inet_addr( address_string.c_str( ) );
+            // Here "address" must be a string not "char*" to avoid pointer to destroyed temporary object
+            std::string address = parameters->value_or< std::string >(
+                  "address", common::default_values::address_unix
+               ).first;
+
+            struct sockaddr_un addr_un;
+            memset( &addr_un, 0, sizeof( sockaddr_un ) );
+            addr_un.sun_family = socket_family;
+            strncpy( addr_un.sun_path, address.c_str( ), sizeof(addr_un.sun_path) - 1 );
+            unlink( address.c_str( ) );
+            int addr_un_size = sizeof( addr_un.sun_family ) + strlen( addr_un.sun_path );
+
+            result_bind = bind( master_socket, (sockaddr*)(&addr_un), addr_un_size );
+
+            break;
          }
-         const int port = parameters->value_or< int >( "port", common::default_values::port ).first;
+         case AF_INET:
+         {
+            uint32_t address = htonl( INADDR_ANY );
+            const std::string address_string = parameters->value_or< std::string >( "address", "" ).first;
+            if( !address_string.empty( ) )
+            {
+               address = inet_addr( address_string.c_str( ) );
+            }
+            const int port = parameters->value_or< int >( "port", common::default_values::port ).first;
 
-         struct sockaddr_in addr_in;
-         memset( &addr_in, 0, sizeof( sockaddr_in ) );
-         addr_in.sin_family = socket_family;
-         addr_in.sin_addr.s_addr = address;
-         addr_in.sin_port = htons( port );
-         int addr_in_size = sizeof( addr_in );
+            struct sockaddr_in addr_in;
+            memset( &addr_in, 0, sizeof( sockaddr_in ) );
+            addr_in.sin_family = socket_family;
+            addr_in.sin_addr.s_addr = address;
+            addr_in.sin_port = htons( port );
+            int addr_in_size = sizeof( addr_in );
 
-         result_bind = bind( master_socket, (sockaddr*)(&addr_in), addr_in_size );
+            result_bind = bind( master_socket, (sockaddr*)(&addr_in), addr_in_size );
+
+            break;
+         }
+         case AF_VSOCK:
+         {
+            const int address = parameters->value_or< int >( "address", common::default_values::address_vsock ).first;
+            const int port = parameters->value_or< int >( "port", common::default_values::port ).first;
+
+            struct sockaddr_vm addr_vm;
+            memset( &addr_vm, 0, sizeof( sockaddr_vm ) );
+            addr_vm.svm_family = socket_family;
+            addr_vm.svm_cid = address;
+            addr_vm.svm_port = port;
+            int addr_vm_size = sizeof( addr_vm );
+
+            result_bind = bind( master_socket, (sockaddr*)&addr_vm, addr_vm_size );
+
+            break;
+         }
+         default:
+         {
+            MSG_ERR( "Unsuported family pretocole" );
+         }
       }
-      else if( AF_VSOCK == socket_family )
-      {
-         const int address = parameters->value_or< int >( "address", common::default_values::address_vsock ).first;
-         const int port = parameters->value_or< int >( "port", common::default_values::port ).first;
-
-         struct sockaddr_vm addr_vm;
-         memset( &addr_vm, 0, sizeof( sockaddr_vm ) );
-         addr_vm.svm_family = socket_family;
-         addr_vm.svm_cid = address;
-         addr_vm.svm_port = port;
-         int addr_vm_size = sizeof( addr_vm );
-
-         result_bind = bind( master_socket, (sockaddr*)&addr_vm, addr_vm_size );
-      }
-
-
 
       if( -1 == result_bind )
       {
