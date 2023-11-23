@@ -5,7 +5,7 @@
 
 
 
-namespace sot::random {
+namespace lisot::random {
 
    void init( );
    std::string text( size_t length );

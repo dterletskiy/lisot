@@ -4,7 +4,7 @@
 
 
 
-namespace sot::random {
+namespace lisot::random {
 
    void init( )
    {
